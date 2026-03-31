@@ -19,7 +19,7 @@ class HomeScreen extends ConsumerWidget {
           children: [
             _WelcomeBanner(),
             const SizedBox(height: 24),
-            Text('Quick Actions', style: AppTextStyles.headlineMedium),
+            Text('Quick Actions', style: AppTextStyles.h3),
             const SizedBox(height: 12),
             _QuickActionsGrid(),
           ],
@@ -37,7 +37,7 @@ class _WelcomeBanner extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
+          colors: [AppColors.primary, Color(0xFF8B0000)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -46,10 +46,25 @@ class _WelcomeBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Welcome to', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textOnPrimary.withOpacity(0.8))),
-          Text(AppConstants.university, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.textOnPrimary)),
+          Text(
+            'Welcome to',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textOnPrimary.withValues(alpha: 0.8),
+            ),
+          ),
+          Text(
+            AppConstants.university,
+            style: AppTextStyles.headlineSmall.copyWith(
+              color: AppColors.textOnPrimary,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text('Where would you like to go?', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textOnPrimary.withOpacity(0.7))),
+          Text(
+            'Where would you like to go?',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textOnPrimary.withValues(alpha: 0.7),
+            ),
+          ),
         ],
       ),
     );
@@ -61,9 +76,21 @@ class _QuickActionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = [
       _ActionItem(icon: Icons.explore, label: 'Explore', color: AppColors.info),
-      _ActionItem(icon: Icons.qr_code_scanner, label: 'Scan QR', color: AppColors.success),
-      _ActionItem(icon: Icons.view_in_ar, label: 'AR Nav', color: AppColors.primary),
-      _ActionItem(icon: Icons.map_outlined, label: 'Campus Map', color: AppColors.warning),
+      _ActionItem(
+        icon: Icons.qr_code_scanner,
+        label: 'Scan QR',
+        color: AppColors.success,
+      ),
+      _ActionItem(
+        icon: Icons.view_in_ar,
+        label: 'AR Nav',
+        color: AppColors.primary,
+      ),
+      _ActionItem(
+        icon: Icons.map_outlined,
+        label: 'Campus Map',
+        color: AppColors.warning,
+      ),
     ];
     return GridView.count(
       crossAxisCount: 2,
@@ -82,7 +109,11 @@ class _ActionItem extends StatelessWidget {
   final String label;
   final Color color;
 
-  const _ActionItem({required this.icon, required this.label, required this.color});
+  const _ActionItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +121,13 @@ class _ActionItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

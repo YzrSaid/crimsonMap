@@ -18,7 +18,7 @@ class CustomBottomNavbar extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: onTap,
       selectedItemColor: AppColors.primary,
-      unselectedItemColor: AppColors.textDisabled,
+      unselectedItemColor: AppColors.muted,
       type: BottomNavigationBarType.fixed,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: AppStrings.navHome),

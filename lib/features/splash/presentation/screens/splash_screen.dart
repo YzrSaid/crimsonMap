@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               const SizedBox(height: 24),
               Text(
                 AppConstants.appName,
-                style: AppTextStyles.displayMedium.copyWith(color: AppColors.textOnPrimary),
+                style: AppTextStyles.display.copyWith(color: AppColors.textOnPrimary),
               ),
               const SizedBox(height: 8),
               Text(

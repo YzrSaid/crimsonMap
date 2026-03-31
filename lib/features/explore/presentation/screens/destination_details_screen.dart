@@ -34,7 +34,7 @@ class DestinationDetailsScreen extends ConsumerWidget {
                 title: Text(destination.name, style: AppTextStyles.titleLarge.copyWith(color: AppColors.textOnPrimary)),
                 background: destination.imageUrl != null
                     ? Image.network(destination.imageUrl!, fit: BoxFit.cover)
-                    : Container(color: AppColors.primaryDark),
+                    : Container(color: AppColors.primary),
               ),
             ),
             SliverPadding(

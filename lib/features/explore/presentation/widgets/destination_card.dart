@@ -26,7 +26,7 @@ class DestinationCard extends StatelessWidget {
               borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
               child: destination.imageUrl != null
                   ? Image.network(destination.imageUrl!, width: 90, height: 90, fit: BoxFit.cover)
-                  : Container(width: 90, height: 90, color: AppColors.primaryLight, child: const Icon(Icons.place, color: AppColors.textOnPrimary, size: 32)),
+                  : Container(width: 90, height: 90, color: AppColors.primary, child: const Icon(Icons.place, color: AppColors.textOnPrimary, size: 32)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -50,7 +50,7 @@ class DestinationCard extends StatelessWidget {
             ),
             const Padding(
               padding: EdgeInsets.only(right: 8),
-              child: Icon(Icons.chevron_right, color: AppColors.textDisabled),
+              child: Icon(Icons.chevron_right, color: AppColors.muted),
             ),
           ],
         ),

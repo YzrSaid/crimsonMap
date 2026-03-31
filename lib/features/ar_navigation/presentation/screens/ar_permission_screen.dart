@@ -27,7 +27,7 @@ class ArPermissionScreen extends StatelessWidget {
             children: [
               const Icon(Icons.camera_alt_outlined, size: 80, color: AppColors.primary),
               const SizedBox(height: 24),
-              Text(AppStrings.arPermissionTitle, style: AppTextStyles.headlineMedium, textAlign: TextAlign.center),
+              Text(AppStrings.arPermissionTitle, style: AppTextStyles.h3, textAlign: TextAlign.center),
               const SizedBox(height: 12),
               Text(AppStrings.arPermissionBody, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
               const SizedBox(height: 40),
