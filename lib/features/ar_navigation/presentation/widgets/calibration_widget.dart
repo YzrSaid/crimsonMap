@@ -17,8 +17,10 @@ class _CalibrationWidgetState extends State<CalibrationWidget>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))
-      ..repeat();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
   }
 
   @override
@@ -37,12 +39,26 @@ class _CalibrationWidgetState extends State<CalibrationWidget>
           children: [
             RotationTransition(
               turns: _controller,
-              child: const Icon(Icons.explore, size: 64, color: AppColors.primary),
+              child: const Icon(
+                Icons.explore,
+                size: 64,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(height: 16),
-            Text(AppStrings.arCalibrating, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.textOnPrimary)),
+            Text(
+              AppStrings.arCalibrating,
+              style: AppTextStyles.headlineSmall.copyWith(
+                color: AppColors.textOnPrimary,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text('Point your phone around slowly', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textOnPrimary.withOpacity(0.7))),
+            Text(
+              'Point your phone around slowly',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textOnPrimary.withValues(alpha: 0.7),
+              ),
+            ),
           ],
         ),
       ),

@@ -11,6 +11,11 @@ import '../widgets/onboarding_indicator.dart';
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
 
+  Future<void> _finish(BuildContext context, WidgetRef ref) async {
+    await ref.read(onboardingProvider.notifier).completeOnboarding();
+    if (context.mounted) context.go(RouteNames.home);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(onboardingProvider);
@@ -24,7 +29,7 @@ class OnboardingScreen extends ConsumerWidget {
             Align(
               alignment: Alignment.topRight,
               child: TextButton(
-                onPressed: () => context.go(RouteNames.login),
+                onPressed: () => _finish(context, ref),
                 child: const Text(AppStrings.onboardingSkip),
               ),
             ),
@@ -42,9 +47,11 @@ class OnboardingScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ElevatedButton(
                 onPressed: state.isLastPage
-                    ? () => context.go(RouteNames.login)
+                    ? () => _finish(context, ref)
                     : notifier.nextPage,
-                child: Text(state.isLastPage ? AppStrings.onboardingGetStarted : AppStrings.onboardingNext),
+                child: Text(
+                  state.isLastPage ? AppStrings.onboardingGetStarted : AppStrings.onboardingNext,
+                ),
               ),
             ),
             const SizedBox(height: 32),

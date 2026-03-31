@@ -5,6 +5,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../routes/route_names.dart';
+import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,7 +29,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   Future<void> _navigate() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (mounted) context.go(RouteNames.onboarding);
+    if (!mounted) return;
+
+    final done = await isOnboardingComplete();
+    if (!mounted) return;
+
+    context.go(done ? RouteNames.home : RouteNames.onboarding);
   }
 
   @override
@@ -56,7 +62,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               const SizedBox(height: 8),
               Text(
                 AppConstants.universityShort,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textOnPrimary.withOpacity(0.8)),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textOnPrimary.withValues(alpha: 0.8),
+                ),
               ),
             ],
           ),

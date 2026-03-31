@@ -8,7 +8,9 @@ class ExploreRemoteDatasource {
   Future<List<DestinationModel>> getDestinations() async {
     try {
       final data = await SupabaseService.client.from('destinations').select();
-      return (data as List).map((e) => DestinationModel.fromJson(e as Map<String, dynamic>)).toList();
+      return (data as List)
+          .map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -20,7 +22,9 @@ class ExploreRemoteDatasource {
           .from('destinations')
           .select()
           .ilike('name', '%$query%');
-      return (data as List).map((e) => DestinationModel.fromJson(e as Map<String, dynamic>)).toList();
+      return (data as List)
+          .map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -33,7 +37,7 @@ class ExploreRemoteDatasource {
           .select()
           .eq('id', id)
           .single();
-      return DestinationModel.fromJson(data as Map<String, dynamic>);
+      return DestinationModel.fromJson(data);
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -42,7 +46,9 @@ class ExploreRemoteDatasource {
   Future<List<BuildingModel>> getBuildings() async {
     try {
       final data = await SupabaseService.client.from('buildings').select();
-      return (data as List).map((e) => BuildingModel.fromJson(e as Map<String, dynamic>)).toList();
+      return (data as List)
+          .map((e) => BuildingModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -51,7 +57,9 @@ class ExploreRemoteDatasource {
   Future<List<CategoryModel>> getCategories() async {
     try {
       final data = await SupabaseService.client.from('categories').select();
-      return (data as List).map((e) => CategoryModel.fromJson(e as Map<String, dynamic>)).toList();
+      return (data as List)
+          .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

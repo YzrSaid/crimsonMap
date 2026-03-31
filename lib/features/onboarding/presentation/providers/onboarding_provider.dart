@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const _kOnboardingDoneKey = 'crimson_map_onboarding_complete';
+
+/// Reads the onboarding completion flag from persistent storage.
+/// Works on Android, iOS, and all Flutter desktop targets (Linux, Windows, macOS).
+Future<bool> isOnboardingComplete() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(_kOnboardingDoneKey) ?? false;
+}
 
 class OnboardingPageData {
   final String title;
@@ -41,17 +51,20 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         pages: const [
           OnboardingPageData(
             title: 'Navigate the Campus',
-            description: 'Explore Western Mindanao State University with ease using an interactive campus map.',
+            description:
+                'Explore Western Mindanao State University with ease using an interactive campus map.',
             imagePath: 'assets/images/onboarding_1.png',
           ),
           OnboardingPageData(
             title: 'Scan & Go',
-            description: 'Scan QR codes placed around campus to instantly get directions to your destination.',
+            description:
+                'Scan QR codes placed around campus to instantly get directions to your destination.',
             imagePath: 'assets/images/onboarding_2.png',
           ),
           OnboardingPageData(
             title: 'AR Navigation',
-            description: 'Follow augmented reality arrows overlaid on your camera view to reach any building.',
+            description:
+                'Follow augmented reality arrows overlaid on your camera view to reach any building.',
             imagePath: 'assets/images/onboarding_3.png',
           ),
         ],
@@ -64,6 +77,13 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  /// Persists the onboarding completion flag so the user never sees
+  /// the onboarding flow again, even after a cold restart.
+  Future<void> completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kOnboardingDoneKey, true);
   }
 }
 

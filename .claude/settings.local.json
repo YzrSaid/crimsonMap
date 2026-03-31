@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(BASE=\"/media/yazar/SAID SSD/1 -MY CODES/FLUTTER/crimson_map/lib\")",
+      "Bash(__NEW_LINE_52b8d2e7c7473f09__ mkdir:*)",
+      "Bash(__NEW_LINE_52b8d2e7c7473f09__ echo:*)",
+      "Bash(flutter pub:*)"
+    ]
+  }
+}

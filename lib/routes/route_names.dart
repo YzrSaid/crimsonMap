@@ -3,7 +3,6 @@ class RouteNames {
 
   static const String splash = '/';
   static const String onboarding = '/onboarding';
-  static const String login = '/login';
   static const String shell = '/shell';
   static const String home = '/shell/home';
   static const String explore = '/shell/explore';
