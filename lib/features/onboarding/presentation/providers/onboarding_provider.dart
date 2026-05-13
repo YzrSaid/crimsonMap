@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/constants/app_assets.dart';
 
 const _kOnboardingDoneKey = 'crimson_map_onboarding_complete';
 
-/// Reads the onboarding completion flag from persistent storage.
-/// Works on Android, iOS, and all Flutter desktop targets (Linux, Windows, macOS).
 Future<bool> isOnboardingComplete() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getBool(_kOnboardingDoneKey) ?? false;
@@ -25,12 +23,10 @@ class OnboardingPageData {
 
 class OnboardingState {
   final int currentPage;
-  final PageController pageController;
   final List<OnboardingPageData> pages;
 
-  OnboardingState({
+  const OnboardingState({
     required this.currentPage,
-    required this.pageController,
     required this.pages,
   });
 
@@ -38,49 +34,44 @@ class OnboardingState {
 
   OnboardingState copyWith({int? currentPage}) => OnboardingState(
         currentPage: currentPage ?? this.currentPage,
-        pageController: pageController,
         pages: pages,
       );
 }
 
 class OnboardingNotifier extends Notifier<OnboardingState> {
   @override
-  OnboardingState build() => OnboardingState(
+  OnboardingState build() => const OnboardingState(
         currentPage: 0,
-        pageController: PageController(),
-        pages: const [
+        pages: [
           OnboardingPageData(
-            title: 'Navigate the Campus',
+            title: 'Welcome!',
             description:
-                'Explore Western Mindanao State University with ease using an interactive campus map.',
-            imagePath: 'assets/images/onboarding_1.png',
+                'Hello, Crimsons! Welcome to CrimsonMap, the official AR mobile app for WMSU.',
+            imagePath: AppAssets.onboarding1,
           ),
           OnboardingPageData(
-            title: 'Scan & Go',
+            title: 'Navigate with Confidence!',
             description:
-                'Scan QR codes placed around campus to instantly get directions to your destination.',
-            imagePath: 'assets/images/onboarding_2.png',
+                'Navigate your campus with confidence. Find buildings, explore routes, and never get lost again!',
+            imagePath: AppAssets.onboarding2,
           ),
           OnboardingPageData(
-            title: 'AR Navigation',
+            title: 'Explore Smarter!',
             description:
-                'Follow augmented reality arrows overlaid on your camera view to reach any building.',
-            imagePath: 'assets/images/onboarding_3.png',
+                'Discover key spots around campus, from classrooms to offices with smart path recommendations.',
+            imagePath: AppAssets.onboarding3,
+          ),
+          OnboardingPageData(
+            title: "Let's Get Started!",
+            description:
+                'Join your fellow students using CrimsonMap to explore WMSU. Tap below to start your journey!',
+            imagePath: AppAssets.onboarding4,
           ),
         ],
       );
 
-  void onPageChanged(int page) => state = state.copyWith(currentPage: page);
+  void setPage(int page) => state = state.copyWith(currentPage: page);
 
-  void nextPage() {
-    state.pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  /// Persists the onboarding completion flag so the user never sees
-  /// the onboarding flow again, even after a cold restart.
   Future<void> completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kOnboardingDoneKey, true);

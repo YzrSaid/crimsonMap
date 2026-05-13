@@ -12,10 +12,14 @@ class AppAssets {
   static const String campusMap = '$_images/campus_map.png';
   static const String wmsuCrest = '$_images/wmsu_crest.png';
 
-  // Onboarding
+  // Onboarding banner (campus photo, rendered at reduced opacity)
+  static const String onboardingBanner = '$_images/wmsu_banner.png';
+
+  // Per-page illustrations
   static const String onboarding1 = '$_images/onboarding_1.png';
   static const String onboarding2 = '$_images/onboarding_2.png';
   static const String onboarding3 = '$_images/onboarding_3.png';
+  static const String onboarding4 = '$_images/onboarding_4.png';
 
   // Icons
   static const String iconAr = '$_icons/ic_ar.svg';

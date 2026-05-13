@@ -46,3 +46,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+android/unityLibrary/build/
+android/unityLibrary/src/main/Il2CppOutputProject/IL2CPP/build/

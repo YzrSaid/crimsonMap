@@ -33,7 +33,7 @@ class ExploreScreen extends ConsumerWidget {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: state.categories.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (_, i) => CategoryChipWidget(
                   category: state.categories[i],
                   isSelected: state.selectedCategoryId == state.categories[i].id,
@@ -54,7 +54,7 @@ class ExploreScreen extends ConsumerWidget {
                         : ListView.separated(
                             padding: const EdgeInsets.all(16),
                             itemCount: state.destinations.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 12),
+                            separatorBuilder: (_, _) => const SizedBox(height: 12),
                             itemBuilder: (_, i) => DestinationCard(destination: state.destinations[i]),
                           ),
           ),

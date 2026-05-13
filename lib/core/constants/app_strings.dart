@@ -21,7 +21,7 @@ class AppStrings {
   // Onboarding
   static const String onboardingSkip = 'Skip';
   static const String onboardingNext = 'Next';
-  static const String onboardingGetStarted = 'Get Started';
+  static const String onboardingGetStarted = "Let's Go!";
 
   // Navigation
   static const String navHome = 'Home';
