@@ -3,7 +3,7 @@ import '../../../../core/errors/exceptions.dart';
 import '../../../../core/services/local_data_service.dart';
 import '../models/route_path_model.dart';
 
-// AR routes are computed by Unity (it owns nodes/edges + pathfinding).
+// AR routes are computed by Unity (it owns nodes/edges + pathfindings).
 // On the Flutter side we just need a minimal RoutePath: destination metadata
 // + straight-line distance for the "X meters away" display in ar_info_card.
 // Unity computes the actual walkable waypoints once it receives the payload.
