@@ -40,11 +40,11 @@ dependencies:
   # Navigation
   go_router: ^14.6.2
 
-  # Supabase
-  supabase_flutter: ^2.8.4
-
   # Mapbox
   mapbox_maps_flutter: ^2.4.0
+
+  # Env / secrets
+  flutter_dotenv: ^5.2.1
 
   # QR Scanner
   mobile_scanner: ^6.0.2
@@ -89,6 +89,8 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animations/
+    - assets/data/
+    - .env
 
   fonts:
     - family: Montserrat

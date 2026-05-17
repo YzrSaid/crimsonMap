@@ -1,8 +1,27 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Location + magnetometer for the user-location puck and compass bearing. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
+
+    <!-- Relax AR requirements imposed by unityLibrary so the APK installs on
+         non-AR devices and devices without the ARCore Depth API. The Unity
+         scene itself still detects ARCore at runtime and shows a fallback. -->
+    <uses-feature android:name="android.hardware.camera.ar" android:required="false"
+        tools:replace="android:required" />
+    <uses-feature android:name="com.google.ar.core.depth" android:required="false"
+        tools:replace="android:required" />
+
     <application
         android:label="crimson_map"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Override the unityLibrary meta-data to make ARCore optional. -->
+        <meta-data android:name="com.google.ar.core" android:value="optional"
+            tools:replace="android:value" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

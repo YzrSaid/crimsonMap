@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConstants {
   AppConstants._();
 
@@ -6,12 +8,11 @@ class AppConstants {
   static const String university = 'Western Mindanao State University';
   static const String universityShort = 'WMSU';
 
-  // Supabase
-  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-
-  // Mapbox
-  static const String mapboxAccessToken = String.fromEnvironment('MAPBOX_ACCESS_TOKEN');
+  static String get mapboxAccessToken {
+    final fromEnv = dotenv.maybeGet('MAPBOX_ACCESS_TOKEN') ?? '';
+    if (fromEnv.isNotEmpty) return fromEnv;
+    return const String.fromEnvironment('MAPBOX_ACCESS_TOKEN');
+  }
 
   // Map defaults (WMSU campus center)
   static const double defaultLatitude = 6.9214;
@@ -20,7 +21,4 @@ class AppConstants {
 
   // QR Scanner
   static const int qrScanDelayMs = 1500;
-
-  // Unity bridge
-  static const String unityMethodChannel = 'com.crimsonmap.unity_bridge';
 }

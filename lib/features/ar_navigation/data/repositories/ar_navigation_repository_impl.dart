@@ -1,12 +1,12 @@
 import '../../domain/entities/route_path.dart';
 import '../../domain/repositories/ar_navigation_repository.dart';
-import '../datasources/ar_navigation_remote_datasource.dart';
+import '../datasources/ar_navigation_local_datasource.dart';
 
 class ArNavigationRepositoryImpl implements ArNavigationRepository {
-  final ArNavigationRemoteDatasource _datasource;
+  final ArNavigationLocalDatasource _datasource;
 
-  ArNavigationRepositoryImpl({ArNavigationRemoteDatasource? datasource})
-      : _datasource = datasource ?? ArNavigationRemoteDatasource();
+  ArNavigationRepositoryImpl({ArNavigationLocalDatasource? datasource})
+      : _datasource = datasource ?? ArNavigationLocalDatasource();
 
   @override
   Future<RoutePath> getArRoute({

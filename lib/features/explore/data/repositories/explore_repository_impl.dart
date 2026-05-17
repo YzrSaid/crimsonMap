@@ -2,13 +2,13 @@ import '../../domain/entities/destination.dart';
 import '../../domain/entities/building.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/repositories/explore_repository.dart';
-import '../datasources/explore_remote_datasource.dart';
+import '../datasources/explore_local_datasource.dart';
 
 class ExploreRepositoryImpl implements ExploreRepository {
-  final ExploreRemoteDatasource _datasource;
+  final ExploreLocalDatasource _datasource;
 
-  ExploreRepositoryImpl({ExploreRemoteDatasource? datasource})
-      : _datasource = datasource ?? ExploreRemoteDatasource();
+  ExploreRepositoryImpl({ExploreLocalDatasource? datasource})
+      : _datasource = datasource ?? ExploreLocalDatasource();
 
   @override
   Future<List<Destination>> getDestinations() => _datasource.getDestinations();

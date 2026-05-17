@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_assets.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
 import '../../../../routes/route_names.dart';
 import '../../../onboarding/presentation/providers/onboarding_provider.dart';
 
@@ -46,27 +43,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: Colors.white,
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(AppAssets.logo, width: 120, height: 120),
-              const SizedBox(height: 24),
-              Text(
-                AppConstants.appName,
-                style: AppTextStyles.display.copyWith(color: AppColors.textOnPrimary),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppConstants.universityShort,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textOnPrimary.withValues(alpha: 0.8),
-                ),
-              ),
-            ],
+          child: Image.asset(
+            AppAssets.logoTransparent,
+            width: 280,
+            height: 280,
+            fit: BoxFit.contain,
           ),
         ),
       ),
