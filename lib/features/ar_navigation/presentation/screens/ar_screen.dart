@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/services/unity_bridge_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_loader.dart';
 import '../../../../shared/widgets/error_state.dart';
@@ -21,6 +22,7 @@ class _ArScreenState extends ConsumerState<ArScreen> {
 
   @override
   void dispose() {
+    UnityBridgeService.detachController();
     _unityController?.dispose();
     super.dispose();
   }
@@ -34,7 +36,11 @@ class _ArScreenState extends ConsumerState<ArScreen> {
         children: [
           // Unity AR view (renders the C# AR navigation scene)
           UnityWidget(
-            onUnityCreated: (controller) => _unityController = controller,
+            onUnityCreated: (controller) {
+              _unityController = controller;
+              UnityBridgeService.attachController(controller);
+            },
+            onUnityMessage: UnityBridgeService.dispatchIncoming,
             useAndroidViewSurface: true,
           ),
 

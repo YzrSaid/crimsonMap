@@ -2,22 +2,15 @@ apply plugin: 'com.android.library'
 
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-// Android Resolver Dependencies Start
-    implementation 'com.google.android.gms:play-services-base:18.7.2' // Assets/Firebase/Editor/AppDependencies.xml:17
-    implementation 'com.google.firebase:firebase-analytics:23.0.0' // Assets/Firebase/Editor/FirestoreDependencies.xml:15
-    implementation 'com.google.firebase:firebase-app-unity:13.2.0' // Assets/Firebase/Editor/AppDependencies.xml:22
-    implementation 'com.google.firebase:firebase-common:22.0.0' // Assets/Firebase/Editor/AppDependencies.xml:13
-    implementation 'com.google.firebase:firebase-firestore:26.0.0' // Assets/Firebase/Editor/FirestoreDependencies.xml:13
-    implementation 'com.google.firebase:firebase-firestore-unity:13.2.0' // Assets/Firebase/Editor/FirestoreDependencies.xml:20
-// Android Resolver Dependencies End
+    implementation(name: 'unity-classes', ext:'jar')
     implementation(name: 'arcore_client', ext:'aar')
+    implementation(name: 'com.mapbox.android.unity-debug', ext:'aar')
     implementation(name: 'UnityARCore', ext:'aar')
     implementation(name: 'ARPresto', ext:'aar')
-    implementation(name: 'com.mapbox.android.unity-debug', ext:'aar')
+    implementation(name: 'libcore-release', ext:'aar')
     implementation(name: 'unityandroidpermissions', ext:'aar')
+    implementation(name: 'libtelemetry-full-release', ext:'aar')
     implementation project('xrmanifest.androidlib')
-    implementation project('FirebaseApp.androidlib')
 
 }
 
@@ -37,7 +30,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 35
         ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a'
+            abiFilters 'armeabi-v7a'
         }
         versionCode 1
         versionName '2.0.0'
@@ -49,7 +42,7 @@ android {
     }
 
     aaptOptions {
-        noCompress = ['.unity3d', '.ress', '.resource', '.obb', '.bundle', '.unityexp'] + unityStreamingAssets.tokenize(', ')
+        noCompress = ['.unity3d', '.ress', '.resource', '.obb', '.bundle', '.unityexp']
         ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~"
     }
 
@@ -60,68 +53,8 @@ android {
         exclude '/lib/x86/**'
         exclude '/lib/x86_64/**'
         doNotStrip '*/armeabi-v7a/*.so'
-        doNotStrip '*/arm64-v8a/*.so'
         jniLibs {
             useLegacyPackaging true
-        }
-    }
-}
-
-def getSdkDir() {
-    Properties local = new Properties()
-    local.load(new FileInputStream("${rootDir}/local.properties"))
-    return local.getProperty('sdk.dir')
-}
-
-def BuildIl2Cpp(String workingDir, String configuration, String architecture, String abi, String[] staticLibraries) {
-    def commandLineArgs = []
-    commandLineArgs.add("--compile-cpp")
-    commandLineArgs.add("--platform=Android")
-    commandLineArgs.add("--architecture=" + architecture)
-    commandLineArgs.add("--outputpath=" + workingDir + "/src/main/jniLibs/" + abi + "/libil2cpp.so")
-    commandLineArgs.add("--baselib-directory=" + workingDir + "/src/main/jniStaticLibs/" + abi)
-    commandLineArgs.add("--configuration=" + configuration)
-    commandLineArgs.add("--dotnetprofile=unityaot-linux")
-    commandLineArgs.add("--profiler-report")
-    commandLineArgs.add("--profiler-output-file=" + workingDir + "/build/il2cpp_"+ abi + "_" + configuration + "/il2cpp_conv.traceevents")
-    commandLineArgs.add("--print-command-line")
-    commandLineArgs.add("--data-folder=" + workingDir + "/src/main/Il2CppOutputProject/Source/il2cppOutput/data")
-    commandLineArgs.add("--generatedcppdir=" + workingDir + "/src/main/Il2CppOutputProject/Source/il2cppOutput")
-    commandLineArgs.add("--cachedirectory=" + workingDir + "/build/il2cpp_"+ abi + "_" + configuration + "/il2cpp_cache")
-    commandLineArgs.add("--tool-chain-path=" + android.ndkDirectory)
-    staticLibraries.eachWithIndex {fileName, i->
-        commandLineArgs.add("--additional-libraries=" + workingDir + "/src/main/jniStaticLibs/" + abi + "/" + fileName)
-    }
-    def executableExtension = ""
-    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
-        executableExtension = ".exe"
-        commandLineArgs = commandLineArgs*.replace('\"', '\\\"')
-    }
-    exec {
-        executable workingDir + "/src/main/Il2CppOutputProject/IL2CPP/build/deploy/il2cpp" + executableExtension
-        args commandLineArgs
-        environment "ANDROID_SDK_ROOT", getSdkDir()
-    }
-    delete workingDir + "/src/main/jniLibs/" + abi + "/libil2cpp.sym.so"
-    ant.move(file: workingDir + "/src/main/jniLibs/" + abi + "/libil2cpp.dbg.so", tofile: workingDir + "/symbols/" + abi + "/libil2cpp.so")
-}
-
-android {
-    task BuildIl2CppTask {
-        doLast {
-              BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'armv7', 'armeabi-v7a', [  ] as String[]);
-              BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'arm64', 'arm64-v8a', [  ] as String[]);
-        }
-    }
-    afterEvaluate {
-        if (project(':unityLibrary').tasks.findByName('mergeDebugJniLibFolders'))
-            project(':unityLibrary').mergeDebugJniLibFolders.dependsOn BuildIl2CppTask
-        if (project(':unityLibrary').tasks.findByName('mergeReleaseJniLibFolders'))
-            project(':unityLibrary').mergeReleaseJniLibFolders.dependsOn BuildIl2CppTask
-    }
-    sourceSets {
-        main {
-            jni.srcDirs = ["src/main/Il2CppOutputProject"]
         }
     }
 }

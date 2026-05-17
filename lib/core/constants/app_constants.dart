@@ -6,10 +6,6 @@ class AppConstants {
   static const String university = 'Western Mindanao State University';
   static const String universityShort = 'WMSU';
 
-  // Supabase
-  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-
   // Mapbox
   static const String mapboxAccessToken = String.fromEnvironment('MAPBOX_ACCESS_TOKEN');
 
@@ -20,7 +16,4 @@ class AppConstants {
 
   // QR Scanner
   static const int qrScanDelayMs = 1500;
-
-  // Unity bridge
-  static const String unityMethodChannel = 'com.crimsonmap.unity_bridge';
 }

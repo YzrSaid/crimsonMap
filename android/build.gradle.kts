@@ -2,6 +2,10 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // Make Unity library artifacts (AARs/JARs) available to all projects
+        flatDir {
+            dirs("${rootProject.projectDir}/unityLibrary/libs")
+        }
     }
 }
 
@@ -18,6 +22,17 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
+
+// Fix for older plugins that don't declare a namespace (required by AGP 8+)
+subprojects {
+    plugins.withId("com.android.library") {
+        val android = extensions.getByType(com.android.build.gradle.LibraryExtension::class.java)
+        if (android.namespace.isNullOrEmpty()) {
+            android.namespace = project.group.toString().ifEmpty { project.name }
+        }
+    }
+}
+
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)

@@ -40,9 +40,6 @@ dependencies:
   # Navigation
   go_router: ^14.6.2
 
-  # Supabase
-  supabase_flutter: ^2.8.4
-
   # Mapbox
   mapbox_maps_flutter: ^2.4.0
 
@@ -89,6 +86,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animations/
+    - assets/data/
 
   fonts:
     - family: Montserrat

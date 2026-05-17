@@ -18,8 +18,26 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# Unity
+# Unity (legacy export path)
 unity_ar/
+
+# Unity project source (kept locally; the FUW export lands in android/unityLibrary)
+unity/*/Library/
+unity/*/Temp/
+unity/*/Logs/
+unity/*/Build/
+unity/*/Builds/
+unity/*/obj/
+unity/*/MemoryCaptures/
+unity/*/UserSettings/
+unity/*/*.apk
+unity/*/*.aab
+unity/*/*.keystore
+unity/*/*_BurstDebugInformation_DoNotShip/
+unity/*/*.csproj
+unity/*/*.sln
+unity/*/.vsconfig
+unity/*/sysroot/
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
