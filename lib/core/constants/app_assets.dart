@@ -9,6 +9,7 @@ class AppAssets {
   // Images
   static const String logo = '$_images/logo.png';
   static const String logoFull = '$_images/logo_full.png';
+  static const String logoTransparent = '$_images/logo_transparent.png';
   static const String campusMap = '$_images/campus_map.png';
   static const String wmsuCrest = '$_images/wmsu_crest.png';
 

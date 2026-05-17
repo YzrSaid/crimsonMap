@@ -44,6 +44,9 @@ unity/*/sysroot/
 # is commented out by default.
 #.vscode/
 
+# Secrets
+.env
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -67,3 +70,4 @@ app.*.map.json
 
 android/unityLibrary/build/
 android/unityLibrary/src/main/Il2CppOutputProject/IL2CPP/build/
+

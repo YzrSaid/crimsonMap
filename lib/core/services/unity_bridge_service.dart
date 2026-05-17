@@ -54,6 +54,13 @@ class UnityBridgeService {
     await _post('UpdateDestination', jsonEncode({'destinationId': destinationId}));
   }
 
+  // Test hook: ask Unity to spawn a primitive shape ~1.5m in front of the
+  // AR camera. Used by the AR test screen while navigation/markers aren't
+  // wired up yet, mirroring ARCore's sample "tap to place" behavior.
+  static Future<void> spawnTestShape() async {
+    await _post('SpawnTestShape', '');
+  }
+
   static Future<void> _post(String method, String message) async {
     final c = _controller;
     if (c == null) {

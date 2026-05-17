@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'features/settings/presentation/providers/settings_provider.dart';
 import 'routes/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (_) {}
+  if (AppConstants.mapboxAccessToken.isNotEmpty) {
+    MapboxOptions.setAccessToken(AppConstants.mapboxAccessToken);
+  }
   runApp(const ProviderScope(child: CrimsonMapApp()));
 }
 
