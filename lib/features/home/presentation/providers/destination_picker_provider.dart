@@ -1,6 +1,39 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/local_data_service.dart';
 
+enum LocationPickerMode { from, destination }
+
+// Provider to track the currently active map
+final activeMapProvider = StateProvider<String>((ref) => 'MAP-01');
+
+// Provider to get all available maps
+final allMapsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final data = LocalDataService.instance;
+  return data.loadJsonArray('maps.json');
+});
+
+// Provider to get infrastructure IDs present in the active map
+final mapInfrastructureIdsProvider = FutureProvider<Set<String>>((ref) async {
+  final activeMap = ref.watch(activeMapProvider);
+  final data = LocalDataService.instance;
+
+  try {
+    final fileName = 'nodes_$activeMap.json';
+    final nodes = await data.loadJsonArray(fileName);
+
+    final infraIds = <String>{};
+    for (final node in nodes) {
+      final infraId = node['related_infra_id'] as String?;
+      if (infraId != null && infraId.isNotEmpty) {
+        infraIds.add(infraId);
+      }
+    }
+    return infraIds;
+  } catch (e) {
+    return {};
+  }
+});
+
 class BuildingOption {
   final String infraId;
   final String name;
@@ -29,8 +62,11 @@ class RoomOption {
   });
 }
 
-final buildingsWithRoomsProvider = FutureProvider<List<BuildingOption>>((ref) async {
+final buildingsWithRoomsProvider = FutureProvider<List<BuildingOption>>((
+  ref,
+) async {
   final data = LocalDataService.instance;
+  final infraIds = await ref.watch(mapInfrastructureIdsProvider.future);
   final infra = await data.infrastructure();
   final indoor = await data.loadJsonArray('indoor.json');
 
@@ -39,34 +75,48 @@ final buildingsWithRoomsProvider = FutureProvider<List<BuildingOption>>((ref) as
     if (row['is_deleted'] == true) continue;
     final infraId = row['infra_id'] as String?;
     if (infraId == null) continue;
+    // Only include rooms for infrastructure in the current map
+    if (!infraIds.contains(infraId)) continue;
+
     final indoorType = (row['indoor_type'] as String?) ?? 'room';
     if (indoorType != 'room') continue;
     roomsByInfra
         .putIfAbsent(infraId, () => [])
-        .add(RoomOption(
-          roomId: row['room_id'] as String? ?? '',
-          name: row['name'] as String? ?? '',
-          infraId: infraId,
-          indoorType: indoorType,
-        ));
+        .add(
+          RoomOption(
+            roomId: row['room_id'] as String? ?? '',
+            name: row['name'] as String? ?? '',
+            infraId: infraId,
+            indoorType: indoorType,
+          ),
+        );
   }
 
-  final buildings = infra
-      .where((r) => r['is_deleted'] != true)
-      .map((r) {
-        final infraId = r['infra_id'] as String? ?? '';
-        final rooms = List<RoomOption>.from(roomsByInfra[infraId] ?? const [])
-          ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-        return BuildingOption(
-          infraId: infraId,
-          name: r['name'] as String? ?? '',
-          acronym: r['acronym'] as String?,
-          rooms: rooms,
-        );
-      })
-      .where((b) => b.infraId.isNotEmpty && b.name.isNotEmpty)
-      .toList()
-    ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+  final buildings =
+      infra
+          .where((r) => r['is_deleted'] != true)
+          .where((r) {
+            // Only include infrastructure that exists in the current map
+            final infraId = r['infra_id'] as String? ?? '';
+            return infraIds.contains(infraId);
+          })
+          .map((r) {
+            final infraId = r['infra_id'] as String? ?? '';
+            final rooms =
+                List<RoomOption>.from(roomsByInfra[infraId] ?? const [])..sort(
+                  (a, b) =>
+                      a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                );
+            return BuildingOption(
+              infraId: infraId,
+              name: r['name'] as String? ?? '',
+              acronym: r['acronym'] as String?,
+              rooms: rooms,
+            );
+          })
+          .where((b) => b.infraId.isNotEmpty && b.name.isNotEmpty)
+          .toList()
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   return buildings;
 });
@@ -81,15 +131,21 @@ class DestinationSelection {
     required this.infraId,
     this.roomId,
   });
+
+  bool sameAs(DestinationSelection other) {
+    return infraId == other.infraId && roomId == other.roomId;
+  }
 }
 
 class HomeSelectionState {
+  final DestinationSelection? fromLocation;
   final DestinationSelection? destination;
   final String currentBuildingName;
   final GpsStatus gpsStatus;
   final bool locked;
 
   const HomeSelectionState({
+    this.fromLocation,
     this.destination,
     this.currentBuildingName = 'Searching for location...',
     this.gpsStatus = GpsStatus.searching,
@@ -97,18 +153,35 @@ class HomeSelectionState {
   });
 
   HomeSelectionState copyWith({
+    DestinationSelection? fromLocation,
     DestinationSelection? destination,
     String? currentBuildingName,
     GpsStatus? gpsStatus,
     bool? locked,
+    bool clearFromLocation = false,
     bool clearDestination = false,
   }) {
     return HomeSelectionState(
+      fromLocation: clearFromLocation
+          ? null
+          : (fromLocation ?? this.fromLocation),
       destination: clearDestination ? null : (destination ?? this.destination),
       currentBuildingName: currentBuildingName ?? this.currentBuildingName,
       gpsStatus: gpsStatus ?? this.gpsStatus,
       locked: locked ?? this.locked,
     );
+  }
+
+  bool get hasFromLocation => fromLocation != null;
+
+  bool get hasDestination => destination != null;
+
+  bool get hasValidRoute {
+    if (fromLocation == null || destination == null) {
+      return false;
+    }
+
+    return !fromLocation!.sameAs(destination!);
   }
 }
 
@@ -118,8 +191,36 @@ class HomeSelectionNotifier extends Notifier<HomeSelectionState> {
   @override
   HomeSelectionState build() => const HomeSelectionState();
 
+  void selectFrom(DestinationSelection selection, {bool autoLock = false}) {
+    final destination = state.destination;
+    final shouldClearDestination =
+        destination != null && selection.sameAs(destination);
+
+    state = state.copyWith(
+      fromLocation: selection,
+      destination: shouldClearDestination ? null : destination,
+      currentBuildingName: selection.label,
+      gpsStatus: autoLock ? GpsStatus.strong : state.gpsStatus,
+      locked: autoLock ? true : state.locked,
+    );
+  }
+
   void selectDestination(DestinationSelection selection) {
+    final fromLocation = state.fromLocation;
+    if (fromLocation != null && selection.sameAs(fromLocation)) {
+      return;
+    }
+
     state = state.copyWith(destination: selection);
+  }
+
+  void clearFromLocation() {
+    state = state.copyWith(
+      clearFromLocation: true,
+      currentBuildingName: 'Searching for location...',
+      gpsStatus: GpsStatus.searching,
+      locked: false,
+    );
   }
 
   void clearDestination() {
@@ -133,5 +234,5 @@ class HomeSelectionNotifier extends Notifier<HomeSelectionState> {
 
 final homeSelectionProvider =
     NotifierProvider<HomeSelectionNotifier, HomeSelectionState>(
-  HomeSelectionNotifier.new,
-);
+      HomeSelectionNotifier.new,
+    );

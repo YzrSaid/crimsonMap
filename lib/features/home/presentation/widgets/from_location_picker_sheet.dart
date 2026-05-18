@@ -4,16 +4,17 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../providers/destination_picker_provider.dart';
 
-class DestinationPickerSheet extends ConsumerStatefulWidget {
-  const DestinationPickerSheet({super.key});
+/// Modal sheet for selecting the FROM location
+class FromLocationPickerSheet extends ConsumerStatefulWidget {
+  const FromLocationPickerSheet({super.key});
 
   @override
-  ConsumerState<DestinationPickerSheet> createState() =>
-      _DestinationPickerSheetState();
+  ConsumerState<FromLocationPickerSheet> createState() =>
+      _FromLocationPickerSheetState();
 }
 
-class _DestinationPickerSheetState
-    extends ConsumerState<DestinationPickerSheet> {
+class _FromLocationPickerSheetState
+    extends ConsumerState<FromLocationPickerSheet> {
   String _query = '';
   final Set<String> _expanded = {};
 
@@ -44,7 +45,7 @@ class _DestinationPickerSheetState
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Row(
               children: [
-                Text('Select Destination', style: AppTextStyles.h3),
+                Text('Where are you now?', style: AppTextStyles.h3),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -86,24 +87,22 @@ class _DestinationPickerSheetState
               ),
               data: (buildings) {
                 final filtered = _filter(buildings, _query);
-                if (filtered.isEmpty)
+                if (filtered.isEmpty) {
                   return const Center(child: Text('No results'));
-
-                // selected FROM info
-                final from = selection.fromLocation;
-                final selectedFromInfraId = from?.infraId;
-                final selectedFromRoomId = from?.roomId;
-
+                }
                 return ListView.builder(
                   itemCount: filtered.length,
                   itemBuilder: (context, i) {
                     final b = filtered[i];
                     final isExpanded = _expanded.contains(b.infraId);
-
+                    final isSelected =
+                        selection.fromLocation?.infraId == b.infraId &&
+                        selection.fromLocation?.roomId == null;
                     return _BuildingTile(
                       building: b,
                       expanded: isExpanded,
                       query: _query,
+                      isSelected: isSelected,
                       onToggle: () => setState(() {
                         if (isExpanded) {
                           _expanded.remove(b.infraId);
@@ -111,12 +110,10 @@ class _DestinationPickerSheetState
                           _expanded.add(b.infraId);
                         }
                       }),
-                      selectedFromInfraId: selectedFromInfraId,
-                      selectedFromRoomId: selectedFromRoomId,
-                      onSelectBuilding: () => _select(
+                      onSelectBuilding: () => _selectFrom(
                         DestinationSelection(label: b.name, infraId: b.infraId),
                       ),
-                      onSelectRoom: (room) => _select(
+                      onSelectRoom: (room) => _selectFrom(
                         DestinationSelection(
                           label: '${room.name} · ${b.name}',
                           infraId: b.infraId,
@@ -146,8 +143,10 @@ class _DestinationPickerSheetState
     }).toList();
   }
 
-  void _select(DestinationSelection selection) {
-    ref.read(homeSelectionProvider.notifier).selectDestination(selection);
+  void _selectFrom(DestinationSelection selection) {
+    ref
+        .read(homeSelectionProvider.notifier)
+        .selectFrom(selection, autoLock: true);
     Navigator.of(context).pop();
   }
 }
@@ -155,22 +154,20 @@ class _DestinationPickerSheetState
 class _BuildingTile extends StatelessWidget {
   final BuildingOption building;
   final bool expanded;
+  final bool isSelected;
   final String query;
   final VoidCallback onToggle;
   final VoidCallback onSelectBuilding;
   final void Function(RoomOption) onSelectRoom;
-  final String? selectedFromInfraId;
-  final String? selectedFromRoomId;
 
   const _BuildingTile({
     required this.building,
     required this.expanded,
+    required this.isSelected,
     required this.query,
     required this.onToggle,
     required this.onSelectBuilding,
     required this.onSelectRoom,
-    this.selectedFromInfraId,
-    this.selectedFromRoomId,
   });
 
   @override
@@ -182,26 +179,22 @@ class _BuildingTile extends StatelessWidget {
               .where((r) => r.name.toLowerCase().contains(query.toLowerCase()))
               .toList();
 
-    // If FROM is the same infra and FROM.roomId == null => whole building is the FROM
-    // => disable selecting the building and all rooms.
-    // If FROM is same infra but FROM.roomId != null => only the exact same room should be disabled.
-    final bool sameInfra =
-        selectedFromInfraId != null && selectedFromInfraId == building.infraId;
-    final bool buildingDisabled = sameInfra && (selectedFromRoomId == null);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         InkWell(
-          onTap: buildingDisabled ? null : onSelectBuilding,
-          child: Padding(
+          onTap: onSelectBuilding,
+          child: Container(
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: 0.1)
+                : Colors.transparent,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.location_city,
                   size: 22,
-                  color: buildingDisabled ? AppColors.muted : AppColors.primary,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -211,75 +204,58 @@ class _BuildingTile extends StatelessWidget {
                       Text(
                         building.name,
                         style: AppTextStyles.body.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: buildingDisabled
-                              ? AppColors.textSecondary.withValues(alpha: 0.6)
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color: isSelected
+                              ? AppColors.primary
                               : AppColors.textDark,
                         ),
                       ),
                       if (building.acronym != null &&
                           building.acronym!.isNotEmpty)
-                        Text(
-                          building.acronym!,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: buildingDisabled
-                                ? AppColors.textSecondary.withValues(alpha: 0.6)
-                                : AppColors.textSecondary,
-                          ),
-                        ),
+                        Text(building.acronym!, style: AppTextStyles.bodySmall),
                     ],
                   ),
                 ),
-                if (hasRooms)
+                if (isSelected)
+                  const Icon(
+                    Icons.check_circle,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                if (hasRooms && !isSelected)
                   IconButton(
                     icon: Icon(
                       expanded ? Icons.expand_less : Icons.expand_more,
-                      color: buildingDisabled
-                          ? AppColors.textSecondary.withValues(alpha: 0.6)
-                          : null,
                     ),
-                    onPressed: buildingDisabled ? null : onToggle,
+                    onPressed: onToggle,
                   ),
               ],
             ),
           ),
         ),
         if (hasRooms && expanded)
-          ...filteredRooms.map((r) {
-            final bool roomDisabled =
-                sameInfra &&
-                (selectedFromRoomId == null || selectedFromRoomId == r.roomId);
-
-            return InkWell(
-              onTap: roomDisabled ? null : () => onSelectRoom(r),
+          ...filteredRooms.map(
+            (r) => InkWell(
+              onTap: () => onSelectRoom(r),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(48, 8, 16, 8),
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.meeting_room_outlined,
                       size: 18,
-                      color: roomDisabled
-                          ? AppColors.muted
-                          : AppColors.textSecondary,
+                      color: AppColors.textSecondary,
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        r.name,
-                        style: AppTextStyles.body.copyWith(
-                          color: roomDisabled
-                              ? AppColors.textSecondary.withValues(alpha: 0.6)
-                              : AppColors.textDark,
-                        ),
-                      ),
-                    ),
+                    Expanded(child: Text(r.name, style: AppTextStyles.body)),
                   ],
                 ),
               ),
-            );
-          }).toList(),
-        const Divider(height: 1, color: AppColors.divider),
+            ),
+          ),
+        const Divider(height: 1, color: Color(0xFFE0E0E0)),
       ],
     );
   }

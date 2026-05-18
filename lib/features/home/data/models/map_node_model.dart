@@ -22,6 +22,7 @@ class MapNode {
   final double? latitude;
   final double? longitude;
   final String? relatedInfraId;
+  final String? relatedRoomId;
   final String campusId;
   final bool isActive;
 
@@ -32,6 +33,7 @@ class MapNode {
     required this.latitude,
     required this.longitude,
     required this.relatedInfraId,
+    required this.relatedRoomId,
     required this.campusId,
     required this.isActive,
   });
@@ -46,6 +48,7 @@ class MapNode {
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       relatedInfraId: json['related_infra_id'] as String?,
+      relatedRoomId: json['related_room_id'] as String?,
       campusId: json['campus_id'] as String? ?? '',
       isActive: json['is_active'] as bool? ?? true,
     );
