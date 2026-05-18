@@ -2,19 +2,28 @@ import 'package:flutter/material.dart';
 import '../../../../core/services/pathfinding_service.dart' as pathfinding;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../ar_navigation/presentation/screens/ar_screen.dart';
 
 class RoutesModal extends StatefulWidget {
   final List<pathfinding.Route> routes;
   final VoidCallback? onNavigate;
+  final Function(pathfinding.Route)? onRouteSelected;
+  final String? destinationLabel;
 
-  const RoutesModal({super.key, required this.routes, this.onNavigate});
+  const RoutesModal({
+    super.key,
+    required this.routes,
+    this.onNavigate,
+    this.onRouteSelected,
+    this.destinationLabel,
+  });
 
   @override
   State<RoutesModal> createState() => _RoutesModalState();
 }
 
 class _RoutesModalState extends State<RoutesModal> {
-  int? _selectedIndex;
+  pathfinding.Route? _selectedRoute;
   bool _showAll = false;
 
   static const int _initialDisplayCount = 4;
@@ -23,10 +32,10 @@ class _RoutesModalState extends State<RoutesModal> {
   void initState() {
     super.initState();
     // Auto-select the recommended route on open
-    final recommendedIndex = widget.routes.indexWhere((r) => r.isRecommended);
-    if (recommendedIndex != -1) {
-      _selectedIndex = recommendedIndex;
-    }
+    _selectedRoute = widget.routes.firstWhere(
+      (r) => r.isRecommended,
+      orElse: () => widget.routes.first,
+    );
   }
 
   @override
@@ -70,9 +79,11 @@ class _RoutesModalState extends State<RoutesModal> {
                       return _RouteCard(
                         route: displayedRoutes[index],
                         index: index + 1,
-                        isSelected: _selectedIndex == index,
+                        isSelected: _selectedRoute == displayedRoutes[index],
                         onTap: () {
-                          setState(() => _selectedIndex = index);
+                          setState(
+                            () => _selectedRoute = displayedRoutes[index],
+                          );
                         },
                       );
                     }
@@ -108,7 +119,6 @@ class _RoutesModalState extends State<RoutesModal> {
                         ),
                       );
                     }
-
                     // Navigate button — always last
                     return Padding(
                       padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
@@ -116,10 +126,23 @@ class _RoutesModalState extends State<RoutesModal> {
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: _selectedIndex != null
+                          onPressed: _selectedRoute != null
                               ? () {
+                                  widget.onRouteSelected?.call(_selectedRoute!);
                                   widget.onNavigate?.call();
+                                  // Close modal first
                                   Navigator.pop(context);
+                                  // Push AR screen directly
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ArScreen(
+                                        selectedRoute: _selectedRoute,
+                                        destinationLabel:
+                                            widget.destinationLabel,
+                                      ),
+                                    ),
+                                  );
                                 }
                               : null,
                           style: ElevatedButton.styleFrom(

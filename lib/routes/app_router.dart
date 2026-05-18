@@ -17,7 +17,10 @@ final appRouter = GoRouter(
   debugLogDiagnostics: true,
   routes: [
     GoRoute(path: RouteNames.splash, builder: (_, _) => const SplashScreen()),
-    GoRoute(path: RouteNames.onboarding, builder: (_, _) => const OnboardingScreen()),
+    GoRoute(
+      path: RouteNames.onboarding,
+      builder: (_, _) => const OnboardingScreen(),
+    ),
     ShellRoute(
       builder: (context, state, child) => MainNavigationScreen(child: child),
       routes: [
@@ -35,15 +38,30 @@ final appRouter = GoRouter(
             ),
           ],
         ),
-        GoRoute(path: RouteNames.qrScanner, builder: (_, _) => const QrScannerScreen()),
+        GoRoute(
+          path: RouteNames.qrScanner,
+          builder: (_, _) => const QrScannerScreen(),
+        ),
         GoRoute(
           path: RouteNames.ar,
-          builder: (_, _) => const ArScreen(),
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            return ArScreen(
+              selectedRoute: extra?['selectedRoute'],
+              destinationLabel: extra?['destinationLabel'],
+            );
+          },
           routes: [
-            GoRoute(path: 'permission', builder: (_, _) => const ArPermissionScreen()),
+            GoRoute(
+              path: 'permission',
+              builder: (_, _) => const ArPermissionScreen(),
+            ),
           ],
         ),
-        GoRoute(path: RouteNames.settings, builder: (_, _) => const SettingsScreen()),
+        GoRoute(
+          path: RouteNames.settings,
+          builder: (_, _) => const SettingsScreen(),
+        ),
       ],
     ),
   ],

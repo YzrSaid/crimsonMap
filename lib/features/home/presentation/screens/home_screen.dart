@@ -15,8 +15,15 @@ import '../widgets/routes_modal.dart';
 import '../../../../core/services/pathfinding_service.dart' as pathfinding;
 import '../providers/map_data_provider.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  pathfinding.Route? _selectedRoute;
 
   // y-position of the status bar from the top of the screen.
   // Smaller = higher on the banner.
@@ -26,7 +33,8 @@ class HomeScreen extends ConsumerWidget {
   static const double _sectionCardOverlap = 18;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final selection = ref.watch(homeSelectionProvider);
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -276,9 +284,26 @@ class HomeScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => RoutesModal(
+      builder: (modalContext) => RoutesModal(
         routes: routes,
-        onNavigate: () => context.push(RouteNames.ar),
+        destinationLabel: selection.destination?.label,
+        onRouteSelected: (route) {
+          setState(() {
+            _selectedRoute = route;
+          });
+        },
+        onNavigate: () {
+          if (_selectedRoute != null) {
+            Navigator.pop(modalContext); // Close modal first
+            context.push(
+              RouteNames.ar,
+              extra: {
+                'selectedRoute': _selectedRoute,
+                'destinationLabel': selection.destination?.label,
+              },
+            );
+          }
+        },
       ),
     );
   }
